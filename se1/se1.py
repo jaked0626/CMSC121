@@ -5,7 +5,7 @@ def add_one_and_multiply(a, x):
 
     ### EXERCISE 1 -- YOUR CODE GOES HERE
     # Replace "None" with the correct expression
-    r = (1 + a)*x
+    r = (1 + a) * x
 
     ### DO NOT MODIFY THE FOLLOWING LINE!
     return r
@@ -56,7 +56,7 @@ def num_divisible(lb, ub, p, q):
     n = 0
     for i in range(lb, ub + 1):
         if i % p == 0 and i % q == 0:
-            n +=  1
+            n += 1
 
     ### DO NOT MODIFY THE FOLLOWING LINE!
     return n
@@ -91,7 +91,7 @@ def negate_list(lst):
     # we ask you to compute in this exercise
     new_lst = []
     for i in lst:
-        x = i*(-1)
+        x = i * (-1)
         new_lst.append(x)
 
     ### DO NOT MODIFY THE FOLLOWING LINE!
