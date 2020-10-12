@@ -1,7 +1,7 @@
 '''
 Epidemic modelling
 
-YOUR NAME
+Jake Underland
 
 Functions for running a simple epidemiological simulation
 '''
@@ -24,10 +24,14 @@ def count_infected(city):
       currently infected
     '''
 
-    # YOUR CODE HERE
+    num_infected = 0
+    for person in city: 
+      if person.startswith("I") == True:
+        num_infected = num_infected + 1
+    print(num_infected)
 
     # REPLACE -1 WITH THE APPROPRIATE INTEGER
-    return -1
+    return num_infected
 
 
 def has_an_infected_neighbor(city, position):
@@ -67,6 +71,10 @@ def advance_person_at_position(city, position, days_contagious):
     '''
 
     # YOUR CODE HERE
+    # if days contagious c = 3, then if I2, they will advance to R. 
+    # since I0, I1, I2 are number of days they were infected. 
+    # has affected neighbor -> S to I. I to R if contagious days are over. 
+    # R doesn't change. 
 
     # REPLACE None WITH THE APPROPRIATE STRING
     return None
