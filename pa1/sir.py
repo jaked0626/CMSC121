@@ -26,9 +26,8 @@ def count_infected(city):
 
     num_infected = 0
     for person in city: 
-      if person.startswith("I") == True:
+      if person[0] == "I":
         num_infected = num_infected + 1
-    print(num_infected)
 
     # REPLACE -1 WITH THE APPROPRIATE INTEGER
     return num_infected
@@ -50,11 +49,22 @@ def has_an_infected_neighbor(city, position):
     # This function should only be called when the person at position
     # is susceptible to infection.
     assert city[position] == "S"
+    infected_neighbors = False 
+    if position == 0:
+        if len(city) > 1:
+            if city[1][0] == "I":
+                infected_neighbors = True
+    elif position == len(city) - 1:
+        if len(city) > 1:
+            if city[-2][0] == "I":
+                infected_neighbors = True
+    else:
+        if city[position + 1][0] == "I" or city[position - 1][0] == "I":
+            infected_neighbors = True
 
-    # YOUR CODE HERE
 
     # REPLACE None WITH THE APPROPRIATE BOOLEAN VALUE
-    return None
+    return infected_neighbors
 
 
 def advance_person_at_position(city, position, days_contagious):
