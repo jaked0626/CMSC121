@@ -112,9 +112,9 @@ def simulate_one_day(starting_city, days_contagious):
     '''
 
     new_city = []
-    for i in range(len(starting_city)):
-        new_val = advance_person_at_position(starting_city, i, days_contagious)
-        new_city.append(new_val)
+    for index, _ in enumerate(starting_city):
+        new_state = advance_person_at_position(starting_city, index, days_contagious)
+        new_city.append(new_state)
         
 
 
@@ -140,10 +140,18 @@ def run_simulation(starting_city, days_contagious,
     '''
 
     # YOUR CODE HERE
+    days_until_containment = 0
+    new_city = starting_city
+    while count_infected(new_city) > 0:
+        days_until_containment += 1
+        new_city = simulate_one_day(new_city, days_contagious)
+
+
+    
 
     # REPLACE (None, None) WITH THE APPROPRIATE TUPLE
     #  (city, number of days simulated)
-    return (None, None)
+    return (new_city, days_until_containment)
 
 
 def vaccinate_city(starting_city, vaccine_effectiveness):
