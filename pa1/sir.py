@@ -139,7 +139,6 @@ def run_simulation(starting_city, days_contagious,
       and the number of days actually simulated.
     '''
 
-    # YOUR CODE HERE
     days_until_containment = 0
     new_city = starting_city
     while count_infected(new_city) > 0:
@@ -168,10 +167,21 @@ def vaccinate_city(starting_city, vaccine_effectiveness):
       new_city (list): state of the city after vaccinating everyone in the city
     '''
 
-    # YOUR CODE HERE
+    new_city = []
+    for person in starting_city:
+        if person == "S":
+            if random.random() < vaccine_effectiveness:
+                new_city.append("V")
+            else:
+                new_city.append(person)
+        else:
+            new_city.append(person)
+                
+
+        
 
     # REPLACE None WITH THE APPROPRIATE LIST OF STRINGS
-    return None
+    return new_city
 
 
 def calc_avg_days_to_zero_infections(
