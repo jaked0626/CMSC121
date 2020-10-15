@@ -25,11 +25,11 @@ def count_infected(city):
     '''
 
     num_infected = 0
+
     for person in city: 
         if person[0] == "I":
             num_infected = num_infected + 1
 
-    # REPLACE -1 WITH THE APPROPRIATE INTEGER
     return num_infected
 
 
@@ -48,13 +48,16 @@ def has_an_infected_neighbor(city, position):
 
     # This function should only be called when the person at position
     # is susceptible to infection.
+
     assert city[position] == "S"
+
     infected_neighbors = False 
-    if position == 0:
+
+    if position == 0:  # First person with only one neighbor
         if len(city) > 1:
             if city[1][0] == "I":
                 infected_neighbors = True
-    elif position == len(city) - 1:
+    elif position == len(city) - 1:  # Last person with only one neigbor
         if len(city) > 1:
             if city[-2][0] == "I":
                 infected_neighbors = True
@@ -62,8 +65,6 @@ def has_an_infected_neighbor(city, position):
         if city[position + 1][0] == "I" or city[position - 1][0] == "I":
             infected_neighbors = True
 
-
-    # REPLACE None WITH THE APPROPRIATE BOOLEAN VALUE
     return infected_neighbors
 
 
@@ -80,6 +81,7 @@ def advance_person_at_position(city, position, days_contagious):
     Returns: (string) disease state of the person after one day
     '''
     advanced_state = city[position]
+
     if city[position][0] == "I":
         if int(city[position][1:]) < days_contagious - 1:
             updated_days = int(city[position][1:]) + 1
@@ -94,7 +96,6 @@ def advance_person_at_position(city, position, days_contagious):
     # has affected neighbor -> S to I. I to R if contagious days are over. 
     # R doesn't change. 
 
-    # REPLACE None WITH THE APPROPRIATE STRING
     return advanced_state
 
 
@@ -112,13 +113,11 @@ def simulate_one_day(starting_city, days_contagious):
     '''
 
     new_city = []
+
     for index, _ in enumerate(starting_city):
         new_state = advance_person_at_position(starting_city, index, days_contagious)
         new_city.append(new_state)
         
-
-
-    # REPLACE None WITH THE APPROPRIATE LIST OF STRINGS
     return new_city
 
 
@@ -140,17 +139,15 @@ def run_simulation(starting_city, days_contagious,
     '''
 
     days_until_containment = 0
+
     random.seed(random_seed)
+
     new_city = vaccinate_city(starting_city, vaccine_effectiveness)
+
     while count_infected(new_city) > 0:
         days_until_containment += 1
         new_city = simulate_one_day(new_city, days_contagious)
 
-
-
-    
-
-    # REPLACE (None, None) WITH THE APPROPRIATE TUPLE
     #  (city, number of days simulated)
     return (new_city, days_until_containment)
 
@@ -170,6 +167,7 @@ def vaccinate_city(starting_city, vaccine_effectiveness):
     '''
 
     new_city = []
+
     for person in starting_city:
         if person == "S":
             if random.random() < vaccine_effectiveness:
@@ -178,11 +176,7 @@ def vaccinate_city(starting_city, vaccine_effectiveness):
                 new_city.append(person)
         else:
             new_city.append(person)
-                
 
-        
-
-    # REPLACE None WITH THE APPROPRIATE LIST OF STRINGS
     return new_city
 
 
@@ -210,16 +204,15 @@ def calc_avg_days_to_zero_infections(
       infections
     '''
     assert num_trials > 0
+
     total_days = 0
+
     for i in range(num_trials):
-        days = run_simulation(starting_city, days_contagious, random_seed, vaccine_effectiveness)[-1]
+        days_per_trial = run_simulation(starting_city, days_contagious, random_seed, vaccine_effectiveness)[-1]
         random_seed += 1
-        total_days = total_days + days
+        total_days = total_days + days_per_trial
         average_days = total_days / num_trials
 
-
-
-    # REPLACE -1.0 WITH THE APPROPRIATE FLOATING POINT VALUE
     return average_days
 
 
