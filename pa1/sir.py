@@ -26,8 +26,8 @@ def count_infected(city):
 
     num_infected = 0
     for person in city: 
-      if person[0] == "I":
-        num_infected = num_infected + 1
+        if person[0] == "I":
+            num_infected = num_infected + 1
 
     # REPLACE -1 WITH THE APPROPRIATE INTEGER
     return num_infected
@@ -79,15 +79,23 @@ def advance_person_at_position(city, position, days_contagious):
 
     Returns: (string) disease state of the person after one day
     '''
-
-    # YOUR CODE HERE
+    advanced_state = city[position]
+    if city[position][0] == "I":
+        if int(city[position][1:]) < days_contagious - 1:
+            updated_days = int(city[position][1:]) + 1
+            advanced_state = city[position].replace(city[position][1:], str(updated_days))
+        if int(city[position][1:]) == days_contagious - 1:
+            advanced_state = "R"
+    if city[position][0] == "S": 
+        if has_an_infected_neighbor(city, position) == True:
+            advanced_state = "I0"
     # if days contagious c = 3, then if I2, they will advance to R. 
     # since I0, I1, I2 are number of days they were infected. 
     # has affected neighbor -> S to I. I to R if contagious days are over. 
     # R doesn't change. 
 
     # REPLACE None WITH THE APPROPRIATE STRING
-    return None
+    return advanced_state
 
 
 def simulate_one_day(starting_city, days_contagious):
@@ -103,10 +111,15 @@ def simulate_one_day(starting_city, days_contagious):
       new_city (list): disease state of the city after one day
     '''
 
-    # YOUR CODE HERE
+    new_city = []
+    for i in range(len(starting_city)):
+        new_val = advance_person_at_position(starting_city, i, days_contagious)
+        new_city.append(new_val)
+        
+
 
     # REPLACE None WITH THE APPROPRIATE LIST OF STRINGS
-    return None
+    return new_city
 
 
 def run_simulation(starting_city, days_contagious,
