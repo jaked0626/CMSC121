@@ -140,10 +140,12 @@ def run_simulation(starting_city, days_contagious,
     '''
 
     days_until_containment = 0
-    new_city = starting_city
+    random.seed(random_seed)
+    new_city = vaccinate_city(starting_city, vaccine_effectiveness)
     while count_infected(new_city) > 0:
         days_until_containment += 1
         new_city = simulate_one_day(new_city, days_contagious)
+
 
 
     
@@ -208,11 +210,17 @@ def calc_avg_days_to_zero_infections(
       infections
     '''
     assert num_trials > 0
+    total_days = 0
+    for i in range(num_trials):
+        days = run_simulation(starting_city, days_contagious, random_seed, vaccine_effectiveness)[-1]
+        random_seed += 1
+        total_days = total_days + days
+        average_days = total_days / num_trials
 
-    # YOUR CODE HERE
+
 
     # REPLACE -1.0 WITH THE APPROPRIATE FLOATING POINT VALUE
-    return -1.0
+    return average_days
 
 
 ################ Do not change the code below this line #######################
