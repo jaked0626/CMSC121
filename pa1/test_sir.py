@@ -74,12 +74,12 @@ def gen_check_rand_calls(seed, max_num_calls):
                     return False, "Not enough calls to random.random()"
                 return False, "Too many calls to random.random()"
 
-        return False, "Bug in test code?"
+        return False, "Incorrect number of calls to random.random()"
 
     return check
 
 
-CHECK_RAND_20170217 = gen_check_rand_calls(20170217, 7)
+CHECK_RAND_20170217 = gen_check_rand_calls(20170217, 100)
 
 
 def read_config_file(filename):
@@ -385,7 +385,7 @@ def test_vaccinate_city(params):
         # Use pre-generated random checking function
         check_rand = CHECK_RAND_20170217
     else:
-        check_rand = gen_check_rand_calls(params["seed"], 7)
+        check_rand = gen_check_rand_calls(params["seed"], 100)
 
     random.seed(params["seed"])
 
