@@ -1,3 +1,7 @@
+# Programming Assignment 3: Basic Algorithms
+
+# Jake Underland
+
 """
 CS121: Analyzing Election Tweets (Solutions)
 
