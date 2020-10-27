@@ -26,11 +26,15 @@ def count_tokens(tokens):
 
     Returns: dictionary that maps tokens to counts
     '''
+    dic_count_tokens = {}
+    for token in tokens: 
+        if token not in dic_count_tokens:
+            dic_count_tokens[token] = 1
+        else:
+            dic_count_tokens[token] += 1
+    
+    return dic_count_tokens
 
-    # YOUR CODE HERE
-
-    # REPLACE {} WITH A SUITABLE RETURN VALUE
-    return {}
 
 
 def find_top_k(tokens, k):
@@ -49,9 +53,25 @@ def find_top_k(tokens, k):
         raise ValueError("In find_top_k, k must be a non-negative integer")
 
     # YOUR CODE HERE
+    frequency = count_tokens(tokens)
+    lst_frequency = []
+    lst_descend = []
+
+    for entry in frequency.items():
+        lst_frequency.append(entry)
+    lst_descend = sort_count_pairs(lst_frequency)
+    
+    top_k = []
+    if k <= len(lst_descend):
+        for i in range(k):
+            top_k.append(lst_descend[i][0])
+    else:
+        for i in range(len(lst_descend)):
+            top_k.append(lst_descend[i][0])
+
 
     # REPLACE [] WITH A SUITABLE RETURN VALUE
-    return []
+    return top_k
 
 
 def find_min_count(tokens, min_count):
@@ -70,9 +90,45 @@ def find_min_count(tokens, min_count):
         raise ValueError("min_count must be a non-negative integer")
 
     # YOUR CODE HERE
+    frequency = count_tokens(tokens)
+    tokens_over_min_set = set()
+
+    for entry in frequency:
+        if frequency[entry] >= min_count:
+            tokens_over_min_set.add(entry)
+    
+
+   
 
     # REPLACE set() WITH A SUITABLE RETURN VALUE
-    return set()
+    return tokens_over_min_set
+
+
+def compute_tf(t, d):
+    word_frequency = count_tokens(d)
+
+    tf = 0.5 + 0.5 * (word_frequency[t] / max(word_frequency.values()))
+
+    return tf
+
+
+def compute_idf(t, D):
+    N = len(D)
+    count_docs_with_t = 0
+
+    for d in D:
+        if t in d:
+            count_docs_with_t += 1
+
+    idf = math.log(N / count_docs_with_t)
+
+    return idf
+
+
+def compute_tf_idf(t, d, D):
+    tf_idf = compute_tf(t, d) * compute_idf(t, D)
+    
+    return tf_idf
 
 
 def find_salient(docs, threshold):
@@ -87,7 +143,17 @@ def find_salient(docs, threshold):
     Returns: list of sets of salient words
     '''
 
-    # YOUR CODE HERE
+    lst_salients_per_doc = []
 
-    # REPLACE [] WITH A SUITABLE RETURN VALUE
-    return []
+    for d in docs:
+        salients_per_doc = set() 
+        if d != {}:
+            for t in d: 
+                if compute_tf_idf(t, d, docs) > threshold:
+                    salients_per_doc.add(t)
+            lst_salients_per_doc.append(salients_per_doc)
+        else:
+            lst_salients_per_doc.append(salients_per_doc)
+    
+    return lst_salients_per_doc
+                
