@@ -36,6 +36,23 @@ STOP_PREFIXES = ("@", "#", "http", "&amp")
 ############## Part 2 ##############
 
 # Task 2.1
+
+def convert_items_in_entities_to_lst(tweets, entity_desc):
+
+    entity, subkey, case = entity_desc
+    lst_entity = []
+
+    for tweet in tweets:
+
+        for item in tweet['entities'][entity]:
+            if case:
+                lst_entity.append(item[subkey])
+            else: 
+                lst_entity.append(item[subkey].lower())
+
+    return lst_entity
+
+
 def find_top_k_entities(tweets, entity_desc, k):
     '''
     Find the k most frequently occuring entitites
@@ -49,10 +66,11 @@ def find_top_k_entities(tweets, entity_desc, k):
     Returns: list of entities
     '''
 
-    # YOUR CODE HERE
+    lst_entity = convert_items_in_entities_to_lst(tweets, entity_desc)
+    
+    top_k_lst = find_top_k(lst_entity, k)
 
-    # REPLACE [] WITH A SUITABLE RETURN VALUE
-    return []
+    return top_k_lst
 
 
 # Task 2.2
@@ -68,10 +86,13 @@ def find_min_count_entities(tweets, entity_desc, min_count):
 
     Returns: set of entities
     '''
-    # YOUR CODE HERE
+    
+    lst_entity = convert_items_in_entities_to_lst(tweets, entity_desc)
+    
+    min_count_set = find_min_count(lst_entity, min_count)
 
     # REPLACE set() WITH A SUITABLE RETURN VALUE
-    return set()
+    return min_count_set
 
 
 
