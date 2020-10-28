@@ -99,6 +99,71 @@ def find_min_count_entities(tweets, entity_desc, min_count):
 
 ############## Part 3 ##############
 
+
+def convert_lst_words(tweets):
+
+    total_words_lst = []
+
+    for tweet in tweets:
+        word_lst = tweet["abridged_text"].split(" ")
+        for word in word_lst:
+            if len(word) > 0:
+                total_words_lst.append(word)
+        #total_words_lst += word_lst
+
+    return total_words_lst
+
+def remove_punctuation(total_words_lst):
+    new_list = []
+    for word in total_words_lst:
+        stripped = word.strip(PUNCTUATION)
+        if stripped != "":
+            new_list.append(stripped)
+
+
+    return new_list
+
+#def remove_punctuation(total_words_lst):
+
+    new_lst = []
+
+    for word in total_words_lst:
+
+        if len(word) > 0:
+
+            while word[0] in PUNCTUATION:
+                # deletes first character in string until
+                # first character is not a punctuation, or 
+                # all characters are deleted.
+                word = word[1:]
+                if word == "":
+                    break
+
+            if word != "":
+                while word[-1] in PUNCTUATION:
+                    word = word[:-1]
+
+                new_lst.append(word)
+
+    return new_lst
+
+def clean_data(tweets, eliminate_stop, case_sensitive):
+
+    lst = convert_lst_words(tweets)
+    new_lst = remove_punctuation(lst)
+    newer_lst = []
+    #for word in new_lst:
+        #if 
+
+
+
+
+
+#if word[0] in SOTP_PREFIXES:
+#   lst.remove(word)
+
+
+
 def find_top_k_ngrams(tweets, n, case_sensitive, k):
     '''
     Find k most frequently occurring n-grams
