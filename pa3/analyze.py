@@ -37,7 +37,22 @@ STOP_PREFIXES = ("@", "#", "http", "&amp")
 
 # Task 2.1
 
+
 def convert_items_in_entities_to_lst(tweets, entity_desc):
+    '''
+    Given a list of tweets, constructs a list from specified
+    entity and subkey of each tweet, converting the case of 
+    each element as specified. 
+
+    Inputs:
+        tweets: a list of tweets
+        entity_desc: a triple ("hashtags", "text", True),
+          ("user_mentions", "screen_name", False), etc
+        k: integer
+
+    Returns: 
+        lst_entity: list of all entities in collection of tweets.
+    '''
 
     entity, subkey, case = entity_desc
     lst_entity = []
@@ -45,6 +60,7 @@ def convert_items_in_entities_to_lst(tweets, entity_desc):
     for tweet in tweets:
 
         for item in tweet['entities'][entity]:
+
             if case:
                 lst_entity.append(item[subkey])
             else: 
@@ -63,8 +79,12 @@ def find_top_k_entities(tweets, entity_desc, k):
           ("user_mentions", "screen_name", False), etc
         k: integer
 
-    Returns: list of entities
+    Returns: 
+        top_k_lst: list of top k frequentyly occuring entities
     '''
+    
+    # convert tweets into one long list of entities using helper function
+    # and run find_top_k
 
     lst_entity = convert_items_in_entities_to_lst(tweets, entity_desc)
     
@@ -86,6 +106,9 @@ def find_min_count_entities(tweets, entity_desc, min_count):
 
     Returns: set of entities
     '''
+
+    # convert tweets into one long list of entities using helper function
+    # and run find_min_count
     
     lst_entity = convert_items_in_entities_to_lst(tweets, entity_desc)
     
@@ -100,80 +123,166 @@ def find_min_count_entities(tweets, entity_desc, min_count):
 
 
 def convert_tweet_lst(tweet):
+    '''
+    Takes a tweet and converts its abridged text into a list of 
+    words (separated by spaces). 
+
+    Inputs:
+        tweet: dictionary
+
+    Returns: 
+        total_words_lst: list of words
+    '''
 
     total_words_lst = []
+
     word_lst = tweet["abridged_text"].split()
+
     for word in word_lst:
-        if word != "":
+        if word != "":  # Do not add empty spaces as words
             total_words_lst.append(word)
 
     return total_words_lst
 
 def remove_punctuation(total_words_lst):
+    '''
+    Takes a list of words and removes punctuation around word. 
+
+    Inputs:
+        total_words_lst: list of words
+
+    Returns: 
+        new_list: list of words with punctuation removed
+    '''
 
     new_list = []
+
     for word in total_words_lst:
-        stripped = word.strip(PUNCTUATION)
-        if stripped != "":
+
+        stripped = word.strip(PUNCTUATION)  # remove puntuation front and back
+
+        if stripped != "":  # do not add empty spaces as words
             new_list.append(stripped)
 
     return new_list
 
 def convert_to_lower(total_words_lst):
+    '''
+    Takes a list of words and converts words into lower case. 
+
+    Inputs:
+        total_words_lst: list of words
+
+    Returns: 
+        new_lst: list of words in lower case
+    '''
+
     new_lst = []
+
     for word in total_words_lst:
-        new_lst.append(word.lower())
+
+        new_lst.append(word.lower())  # add words in lwoer case form
 
     return new_lst
 
 def remove_stop_words(total_words_lst):
+    '''
+    Takes a list of words and removes STOPWORDS from list. 
+
+    Inputs:
+        total_words_lst: list of words
+
+    Returns: 
+        new_lst: list of words with stopwords removed
+    '''
 
     new_lst = []
+
     for word in total_words_lst:
-        if word not in STOP_WORDS:
+
+        if word not in STOP_WORDS:  # Do not append words in STOP_WORDS
             new_lst.append(word)
 
     return new_lst
 
 
 def remove_prefixes(total_words_lst):
+    '''
+    Takes a list of words and removes words with certain prefixes. 
+
+    Inputs:
+        total_words_lst: list of words
+
+    Returns: 
+        new_list: list of words with certain words with prefixes removed
+    '''
+
     new_list = []
+
     for word in total_words_lst:
-        if word.startswith(STOP_PREFIXES) == False:
+
+        if not word.startswith(STOP_PREFIXES):  
+            # Do not append words with STOP_PREFIXES
             new_list.append(word)
 
     return new_list
 
 
-def clean_data(tweet, eliminate_stop, case_sensitive):
-    lst = convert_tweet_lst(tweet)
-    lst = remove_punctuation(lst)
-    if case_sensitive == False:
+def preprocess(tweet, eliminate_stop, case_sensitive):
+    '''
+    Preprocesses a tweet and returns a list of words treated
+    according to the stipulations.  
+
+    Inputs:
+        tweet: dictionary
+        eliminate_stop: boolean, True if eliminating STOP_WORDS
+        case_sensitive: boolean, True if case sensitive distinction of words.
+
+    Returns: 
+        lst: list of words from tweet preprocessed
+    '''
+
+    lst = convert_tweet_lst(tweet)  # extract text from tweet
+
+    lst = remove_punctuation(lst)  # remove punctuation
+
+    if not case_sensitive:  # convert to lower case not case sensitive
         lst = convert_to_lower(lst)
-    if eliminate_stop:
+
+    if eliminate_stop:  # eliminate stop_words if analysis requires it
         lst = remove_stop_words(lst)
-    lst = remove_prefixes(lst)
+
+    lst = remove_prefixes(lst)  # remove words that start with prefix from lst
 
     return lst
 
 
 def create_ngram_lst(tweet, n, case_sensitive, eliminate_stop):
+    '''
+    Creates a list of ngrams out of extracted text from tweet. 
+
+    Inputs:
+        tweet: dictionary
+        n: integer, specifies how many words ngrams will comprise
+        case_sensitive: boolean, True if case sensitive distinction of words
+        eliminate_stop: boolean, True if analysis requires removal of STOP_WORDS
+
+    Returns: 
+        ngrams: list of ngrams
+    '''
+
     ngrams = []
-    words_in_tweet = clean_data(tweet, eliminate_stop, case_sensitive)
-    for i, word in enumerate(words_in_tweet):
-        if i+n <= len(words_in_tweet):
+
+    # preprocess text in tweet and yield list of words
+    words_in_tweet = preprocess(tweet, eliminate_stop, case_sensitive)
+
+    for i, _ in enumerate(words_in_tweet):
+
+        if i+n <= len(words_in_tweet):  # ngrams do not spill over
             n_gram = tuple(words_in_tweet[i:i+n])
-            ngrams.append(n_gram)
+            ngrams.append(n_gram)  # list of tuples, each containing ngram
+
     return ngrams
-
-
-#def create_ngrams_lst(tweets, n, case_sensitive, eliminate_stop):
-
-    n_grams_lst = []
-    for tweet in tweets:
-        n_grams_lst += create_ngram_lst(tweet, n, case_sensitive, eliminate_stop)
-
-    return n_grams_lst
 
 
 def find_top_k_ngrams(tweets, n, case_sensitive, k):
@@ -186,30 +295,21 @@ def find_top_k_ngrams(tweets, n, case_sensitive, k):
         case_sensitive: boolean
         k: integer
 
-    Returns: list of n-grams
+    Returns: 
+        top_k_n: list of n-grams
     '''
 
     n_grams_lst = []
+
+    # create list of ngrams for each tweet and combine 
+    # into one long list (n_grams_lst).
+
     for tweet in tweets:
         n_grams_lst += create_ngram_lst(tweet, n, case_sensitive, True)
     
     top_k_n = find_top_k(n_grams_lst, k)
     
     return top_k_n
-
-#def words_in_tweets = clean_data(tweets, True, case_sensitive)
-    for i, word in enumerate(words_in_tweets):
-        if i+n <= len(words_in_tweets):
-            n_gram = tuple(words_in_tweets[i:i+n])
-            n_grams_lst.append(n_gram)
-        #else: 
-            #n_gram = tuple(words_in_tweets[i:])
-            #n_grams_lst.append(n_gram)
-    
-    top_k_n = find_top_k(n_grams_lst, k)
-
-    return top_k_n
-
 
 
 def find_min_count_ngrams(tweets, n, case_sensitive, min_count):
@@ -225,6 +325,9 @@ def find_min_count_ngrams(tweets, n, case_sensitive, min_count):
     Returns: set of n-grams
     '''
     n_grams_lst = []
+
+    # create list of ngrams for each tweet and 
+    # combine into one long list (n_grams_lst).
     
     for tweet in tweets:
         n_grams_lst += create_ngram_lst(tweet, n, case_sensitive, True)
@@ -247,8 +350,12 @@ def find_salient_ngrams(tweets, n, case_sensitive, threshold):
     '''
 
     series_of_ngrams = []
+
+    # create list of lists of ngrams per tweet
+
     for tweet in tweets:
-        ngrams = create_ngram_lst(tweet, n, case_sensitive, False)
+
+        ngrams = create_ngram_lst(tweet, n, case_sensitive, False) 
         series_of_ngrams.append(ngrams)
 
     salient_ngrams = find_salient(series_of_ngrams, threshold)
