@@ -100,26 +100,33 @@ def find_min_count_entities(tweets, entity_desc, min_count):
 ############## Part 3 ##############
 
 
-def convert_lst_words(tweets):
 
-    total_words_lst = []
 
-    for tweet in tweets:
-        word_lst = tweet["abridged_text"].split(" ")
+
+def convert_tweet_lst(tweet):
+
+    word_lst = tweet["abridged_text"].split(" ")
         for word in word_lst:
-            if len(word) > 0:
+            if word != "":
                 total_words_lst.append(word)
-        #total_words_lst += word_lst
 
     return total_words_lst
 
 def remove_punctuation(total_words_lst):
+
     new_list = []
     for word in total_words_lst:
         stripped = word.strip(PUNCTUATION)
         if stripped != "":
             new_list.append(stripped)
 
+    return new_list
+
+def remove_prefixes(total_words_lst):
+    new_list = []
+    for word in total_words_lst:
+        if word.startswith(STOP_PREFIXES) == False:
+            new_list.append(word)
 
     return new_list
 
@@ -147,20 +154,42 @@ def remove_punctuation(total_words_lst):
 
     return new_lst
 
-def clean_data(tweets, eliminate_stop, case_sensitive):
+def clean_data(tweet, eliminate_stop, case_sensitive):
 
-    lst = convert_lst_words(tweets)
-    new_lst = remove_punctuation(lst)
-    newer_lst = []
-    #for word in new_lst:
-        #if 
+    lst = convert_tweet_lst(tweet)
+    lst = remove_punctuation(lst)
+    lst = remove_prefixes(lst)
+    new_list = []
+
+    for word in lst:
+        if case_sensitive:
+            if eliminate_stop:
+                if word.lower() not in STOP_WORDS:
+                    new_list.append(word)
+            else:
+                new_list.append(word)
+        else:
+            if eliminate_stop:
+                if word.lower() not in STOP_WORDS:
+                    new_list.append(word.lower())
+            else:
+                new_list.append(word.lower())
+
+    return new_list
 
 
+        #if word.startswith(STOP_PREFIXES) == False:
+            #new_lst.append(word)
 
-
-
-#if word[0] in SOTP_PREFIXES:
-#   lst.remove(word)
+    #for word in newer_lst: 
+        #if eliminate_stop:
+            #if word in STOP_WORDS:
+                #newer_lst.remove(word)
+    
+    #if case_sensitive == False:
+        #newer_lst = lower(newer_lst)
+    
+    #return newer_lst
 
 
 
@@ -176,11 +205,19 @@ def find_top_k_ngrams(tweets, n, case_sensitive, k):
 
     Returns: list of n-grams
     '''
+    n_grams_lst = []
+    words_in_tweets = clean_data(tweets, True, case_sensitive)
+    for i, word in enumerate(words_in_tweets):
+        if i+n <= len(words_in_tweets):
+            n_gram = tuple(words_in_tweets[i:i+n])
+            n_grams_lst.append(n_gram)
+        #else: 
+            #n_gram = tuple(words_in_tweets[i:])
+            #n_grams_lst.append(n_gram)
+    
+    top_k_n = find_top_k(n_grams_lst, k)
 
-    # YOUR CODE HERE
-
-    # REPLACE [] WITH A SUITABLE RETURN VALUE
-    return []
+    return top_k_n
 
 
 
