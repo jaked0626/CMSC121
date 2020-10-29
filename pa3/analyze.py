@@ -91,7 +91,6 @@ def find_min_count_entities(tweets, entity_desc, min_count):
     
     min_count_set = find_min_count(lst_entity, min_count)
 
-    # REPLACE set() WITH A SUITABLE RETURN VALUE
     return min_count_set
 
 
@@ -99,17 +98,6 @@ def find_min_count_entities(tweets, entity_desc, min_count):
 
 ############## Part 3 ##############
 
-#def convert_lst_words(tweets):
-
-    #total_words_lst = []
-
-    #for tweet in tweets:
-        #word_lst = tweet["abridged_text"].split(" ")
-        #for word in word_lst:
-            #if word != "":
-                #total_words_lst.append(word)
-
-    #return total_words_lst
 
 def convert_tweet_lst(tweet):
 
@@ -147,6 +135,7 @@ def remove_stop_words(total_words_lst):
 
     return new_lst
 
+
 def remove_prefixes(total_words_lst):
     new_list = []
     for word in total_words_lst:
@@ -155,29 +144,6 @@ def remove_prefixes(total_words_lst):
 
     return new_list
 
-#def remove_punctuation(total_words_lst):
-
-    new_lst = []
-
-    for word in total_words_lst:
-
-        if len(word) > 0:
-
-            while word[0] in PUNCTUATION:
-                # deletes first character in string until
-                # first character is not a punctuation, or 
-                # all characters are deleted.
-                word = word[1:]
-                if word == "":
-                    break
-
-            if word != "":
-                while word[-1] in PUNCTUATION:
-                    word = word[:-1]
-
-                new_lst.append(word)
-
-    return new_lst
 
 def clean_data(tweet, eliminate_stop, case_sensitive):
     lst = convert_tweet_lst(tweet)
@@ -190,40 +156,6 @@ def clean_data(tweet, eliminate_stop, case_sensitive):
 
     return lst
 
-#def    lst = convert_tweet_lst(tweet)
-    lst = remove_punctuation(lst)
-    lst = remove_prefixes(lst)
-    new_list = []
-
-    for word in lst:
-        if case_sensitive:
-            if eliminate_stop:
-                if word not in STOP_WORDS:
-                    new_list.append(word)
-            else:
-                new_list.append(word)
-        else:
-            if eliminate_stop:
-                if word.lower() not in STOP_WORDS:
-                    new_list.append(word.lower())
-            else:
-                new_list.append(word.lower())
-
-    return new_list
-
-
-        #if word.startswith(STOP_PREFIXES) == False:
-            #new_lst.append(word)
-
-    #for word in newer_lst: 
-        #if eliminate_stop:
-            #if word in STOP_WORDS:
-                #newer_lst.remove(word)
-    
-    #if case_sensitive == False:
-        #newer_lst = lower(newer_lst)
-    
-    #return newer_lst
 
 def create_ngram_lst(tweet, n, case_sensitive, eliminate_stop):
     ngrams = []
@@ -235,15 +167,14 @@ def create_ngram_lst(tweet, n, case_sensitive, eliminate_stop):
     return ngrams
 
 
-def create_ngrams_lst(tweets, n, case_sensitive):
+#def create_ngrams_lst(tweets, n, case_sensitive, eliminate_stop):
+
     n_grams_lst = []
     for tweet in tweets:
-        words_in_tweet = clean_data(tweet, True, case_sensitive)
-        for i, word in enumerate(words_in_tweet):
-            if i+n <= len(words_in_tweet):
-                n_gram = tuple(words_in_tweet[i:i+n])
-                n_grams_lst.append(n_gram)
+        n_grams_lst += create_ngram_lst(tweet, n, case_sensitive, eliminate_stop)
+
     return n_grams_lst
+
 
 def find_top_k_ngrams(tweets, n, case_sensitive, k):
     '''
@@ -257,7 +188,10 @@ def find_top_k_ngrams(tweets, n, case_sensitive, k):
 
     Returns: list of n-grams
     '''
-    n_grams_lst = create_ngrams_lst(tweets, n, case_sensitive)
+
+    n_grams_lst = []
+    for tweet in tweets:
+        n_grams_lst += create_ngram_lst(tweet, n, case_sensitive, True)
     
     top_k_n = find_top_k(n_grams_lst, k)
     
@@ -290,7 +224,11 @@ def find_min_count_ngrams(tweets, n, case_sensitive, min_count):
 
     Returns: set of n-grams
     '''
-    n_grams_lst = create_ngrams_lst(tweets, n, case_sensitive)
+    n_grams_lst = []
+    
+    for tweet in tweets:
+        n_grams_lst += create_ngram_lst(tweet, n, case_sensitive, True)
+
     min_ngrams = find_min_count(n_grams_lst, min_count)
     
     return min_ngrams
