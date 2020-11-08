@@ -25,6 +25,7 @@ def count_infected(city):
         '''
             
         num_infected = 0
+        
         for person in city: 
             if person[0] == "I":
                 num_infected = num_infected + 1
@@ -49,7 +50,6 @@ def has_an_infected_neighbor(city, position):
         # is susceptible to infection.
 
         assert city[position] == "S"
-
         infected_neighbors = False 
 
         if position == 0:  # First person with only one neighbor
@@ -80,6 +80,7 @@ def advance_person_at_position(city, position, days_contagious):
         Returns: (string) disease state of the person after one day
         '''	
         advanced_state = city[position]
+
         if city[position][0] == "I":
             if int(city[position][1:]) < days_contagious - 1:
                 updated_days = int(city[position][1:]) + 1
@@ -137,9 +138,7 @@ def run_simulation(starting_city, days_contagious,
         '''
 
         days_until_containment = 0
-
         random.seed(random_seed)
-
         new_city = vaccinate_city(starting_city, vaccine_effectiveness)
 
         while count_infected(new_city) > 0:
@@ -202,7 +201,6 @@ def calc_avg_days_to_zero_infections(
             infections
         '''
         assert num_trials > 0
-
         total_days = 0
 
         for i in range(num_trials):
