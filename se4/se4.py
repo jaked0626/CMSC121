@@ -1,11 +1,125 @@
 """
 Short Exercises #4
 """
+# Jake Underland 
+
 SIZE = 3
 
 """
 Add your Board class here
 """ 
+
+class Board:
+
+    def __init__(self):
+        """
+        Constructor for the Board class
+
+        Board attributes:
+            board: the game board
+        """
+
+        self.board = [[" ", " ", " "],[" ", " ", " "], [" ", " ", " "]]
+
+    def to_string(self):
+        """
+        Represent board as string.
+
+        Returns:
+          s (string): board in string representation
+        """
+        
+        s = ""
+        for row, _ in enumerate(self.board):
+            s += "|{}|{}|{}|\n".format(self.board[row][0],
+                                    self.board[row][1],
+                                    self.board[row][2])
+            if row != 2:
+                s += "--+-+--\n"
+        
+        return s
+
+
+    def __repr__(self):
+        """
+        Programs object name to return string representation
+        by default.
+        """
+        return self.to_string()
+
+
+    def valid_move(self, row, col):
+        """
+        Validate move:
+          coordinates point to an empty slot
+
+        Input:
+          row: integer
+          col: integer
+
+        Returns: True if valid, False otherwise
+        """
+
+        valid = False
+
+        if 0 <= row <= SIZE - 1 and 0 <= col <= SIZE - 1:
+            valid = True
+            if self.board[row][col] != " ":
+                valid = False
+
+        return valid
+
+
+    def move(self, row, col, Player):
+        """
+        Complete one move of the game.
+
+        Input:
+          row (integer): row of the coordinate in which player
+            places their symbol.
+          col (integer): column of the coordinate in which player
+            places their symbol.
+          Player: Player making the play.
+        Returns:
+           None (alters board in place)
+        """
+
+        self.board[row][col] = Player.symbol
+        
+
+    def winner(self, Player):
+        """
+        Determines if a player won.
+
+        Input:
+          Player: Player we want to determine if victorious
+            or not.
+
+        Returns:
+           victory (Boolean): True if they won, False otherwise
+        """
+        
+        victory = False
+        for i in range(SIZE):
+            if self.board[i][0] == self.board[i][1]\
+                                        == self.board[i][2] == Player.symbol:
+                victory = True
+            if self.board[0][i] == self.board[1][i]\
+                                        == self.board[2][i] == Player.symbol:
+                victory = True
+            if self.board[0][0] == self.board[1][1]\
+                                        == self.board[2][2] == Player.symbol:
+                victory = True
+            if self.board[0][2] == self.board[1][1]\
+                                        == self.board[2][0] == Player.symbol:
+                victory = True
+            
+        return victory
+
+
+
+    
+
 
 """
 DO NOT MODIFY THE CODE BELOW
