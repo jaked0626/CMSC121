@@ -37,15 +37,18 @@
 | 3a.4 - Iterating over dictionaries                |        99 |                  2 |                    2 |       |
 | 3a.5 - Accumulation                               |       100 |                  2 |                    2 |       |
 | 3a.6 - Data structures and their performance      |        95 |                  1 |                    1 |       |
+| 3b.1 - Basic File IO                              |       100 |                  1 |                    1 |       |
+| 3b.2 - CSV Files                                  |        71 |                  1 |                    1 |       |
+| 3b.3 - JSON and other Formats                     |        99 |                  1 |                    1 |       |
 | 4.0 - Introduction                                |         0 |                    |                      |       |
 | 4.1 - Stacks                                      |        87 |                  1 |                    1 |       |
 | 4.2 - Queues                                      |        74 |                  1 |                    1 |       |
-| 4.3 - Class Construction, Attributes, and Methods |        98 |                  1 |                    1 |       |
+| 4.3 - Class Construction, Attributes, and Methods |       100 |                  1 |                    1 |       |
 | 4.4 - Private Attributes                          |       100 |                  1 |                    1 |       |
 | 4.5 - Dunder Methods                              |        95 |                  1 |                    1 |       |
 | 4.6 - Object-Oriented Modeling                    |       100 |                  1 |                    1 |       |
 | 4.7 - Class Composition                           |       100 |                  1 |                    1 |       |
-| **TOTAL**                                         |           |                 52 |                   52 |       |
+| **TOTAL**                                         |           |                 55 |                   55 |       |
 
 You scored 100.00% of the quiz questions correctly.
 
