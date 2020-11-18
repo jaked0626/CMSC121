@@ -48,9 +48,16 @@
 | 4.5 - Dunder Methods                              |        95 |                  1 |                    1 |       |
 | 4.6 - Object-Oriented Modeling                    |       100 |                  1 |                    1 |       |
 | 4.7 - Class Composition                           |       100 |                  1 |                    1 |       |
-| **TOTAL**                                         |           |                 55 |                   55 |       |
+| 5.0 - Meet the Instructor                         |       100 |                    |                      |       |
+| 5.1 - Introduction to NumPy                       |        96 |                  1 |                    1 |       |
+| 5.2 - Creating NumPy Arrays                       |        96 |                  0 |                    1 |       |
+| 5.3 - Array Indexing Basics                       |        92 |                  1 |                    1 |       |
+| 5.4 - Working with Arrays                         |        95 |                  1 |                    1 |       |
+| 5.5 - Advanced Array Manipulations                |        98 |                  1 |                    1 |       |
+| 5.6 - Extended Example: Standardizing Features    |       100 |                  1 |                    1 |       |
+| **TOTAL**                                         |           |                 60 |                   61 |       |
 
-You scored 100.00% of the quiz questions correctly.
+You scored 98.36% of the quiz questions correctly.
 
 Since this is above 75%, you earn the full 5 points allocated to the quizzes.
 

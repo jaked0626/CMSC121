@@ -24,7 +24,7 @@ Short Exercises
 | Short Exercises #2 |            100 |
 | Short Exercises #3 |            100 |
 | Short Exercises #4 |            100 |
-| Short Exercises #5 | Not graded yet |
+| Short Exercises #5 |            100 |
 | Short Exercises #6 | Not graded yet |
 
 
@@ -50,17 +50,17 @@ Total
 ---
 
 **NOTE**: There is still ungraded work, which means the maximum
-number of possible points is currently 45.00
+number of possible points is currently 47.50
 
 ---
 
 |                         | Points Obtained | Points Possible (so far) | Maximum Points |
 |-------------------------|----------------:|-------------------------:|---------------:|
 | Programming Assignments |           23.92 |                    25.00 |             50 |
-| Short Exercises         |           10.00 |                    10.00 |             15 |
+| Short Exercises         |           12.50 |                    12.50 |             15 |
 | Timed Assessments       |            4.95 |                     5.00 |             30 |
 | Quizzes                 |            5.00 |                     5.00 |              5 |
-| **TOTAL**               |           43.87 |                    45.00 |            100 |
+| **TOTAL**               |           46.37 |                    47.50 |            100 |
 
-Your total score (out of 100) is 97.48
+Your total score (out of 100) is 97.61
 
