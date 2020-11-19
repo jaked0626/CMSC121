@@ -225,16 +225,15 @@ def forward_selection(dataset):
     # independent variables that yield the highest value of R2 for each K. 
     best_indices = []
     lst_pred = dataset.pred_vars[:]
-    P = len(lst_pred)
 
-    for k in range(P):
+    for k, _ in enumerate(lst_pred):
         best_R2 = 0
         for i in lst_pred:
-            # create k_lst, a cumulative list with best combination of indices
-            if k == 0:
-                k_lst = []
-            else:
+            # create k_lst by extracting last list on best_indices and adding i
+            if k > 0:
                 k_lst = list(best_indices[-1])
+            else: 
+                k_lst = []
             if i not in k_lst:  # no two of the same indices in one list
                 k_lst.append(i)
                 k_lst_R2 = Model(dataset, k_lst).R2
@@ -245,7 +244,6 @@ def forward_selection(dataset):
         # update best_indices per K, so next list can build off of last
         best_indices.append(best_k_lst)  
         
-    
     return [Model(dataset, i) for i in best_indices]
 
 
