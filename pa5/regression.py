@@ -181,9 +181,9 @@ def compute_best_pair(dataset):
     # predictor variables
     best_biv = Model(dataset, lst_pred[0:2])
 
-    for i in lst_pred:
-        for j in range(i + 1, lst_pred[-1] + 1):
-            new_biv = Model(dataset, [i, j])
+    for i, x in enumerate(lst_pred):
+        for y in lst_pred[i+1:]:
+            new_biv = Model(dataset, [x, y])
             if new_biv.R2 > best_biv.R2:
                 best_biv = new_biv
 
@@ -211,14 +211,17 @@ def forward_selection(dataset):
     for k, _ in enumerate(lst_pred):
         best_R2 = 0
         for i in lst_pred:
-            # create k_lst, a cumulative list with best combination of indices
+            # create k_lst, a cumulative list with best combination of indices,
+            # no overlap of indices
             if k > 0:
                 k_lst = list(best_indices[-1])
-            else: 
+            else:
                 k_lst = []
-            if i not in k_lst:  # no two of the same indices in one list
+
+            if i not in k_lst:  
                 k_lst.append(i)
                 k_lst_R2 = Model(dataset, k_lst).R2
+
                 if k_lst_R2 > best_R2:
                     best_R2 = k_lst_R2
                     best_k_lst = list(k_lst)
