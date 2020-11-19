@@ -55,9 +55,8 @@ class Model(object):
         self.pred_vars = pred_vars
         self.names = dataset.labels
         self.training_data = dataset.training_data
-        self.testing_data = dataset.testing_data
         self.beta = self.create_beta()
-        self.R2 = self.find_R2(self.training_data)  # R2 using training data
+        self.R2 = self.find_R2(self.training_data)  # default w/ training_data
     
     def __repr__(self):
         '''
@@ -76,12 +75,10 @@ class Model(object):
         the first column which is all ones.
         
         Input: 
-            training(boolean): true if operating on training data, 
-              false otherwise.
+            data(np.array): data used to construct x.
         Returns:
             x: np.array
         '''
-        x = data[:, self.pred_vars]
         x = data[:, self.pred_vars]
         x = util.prepend_ones_column(x)
 
@@ -92,8 +89,7 @@ class Model(object):
         Creates a list of observations for dependent variable y. 
         
         Input: 
-            training(boolean): true if operating on training data, 
-              false otherwise.
+            data(np.array): data used to construct y
         Returns:
             y: list
         '''
@@ -120,8 +116,7 @@ class Model(object):
         Computes the R2 value of the model.  
         
         Input: 
-            training(boolean): true if operating on training data, 
-              false otherwise.
+            data(np.array): data used to construct find R2.
         Returns:
             R_squared: R2 value of the model. 
         '''
@@ -171,9 +166,9 @@ def compute_best_pair(dataset):
     Returns:
         A Model object for the best bivariate model
     '''
-    lst_pred = dataset.pred_vars[:]
     # initialize best bivariate model to the first possible combination of
     # predictor variables
+    lst_pred = dataset.pred_vars[:]
     best_biv = Model(dataset, lst_pred[0:2])
 
     for i, x in enumerate(lst_pred):
@@ -200,7 +195,7 @@ def forward_selection(dataset):
 
     # create list of lists of indices to keep track of index combinations for 
     # independent variables that yield the highest value of R2 for each K, and
-    # a list of models using those indices. 
+    # a list of models containing those indices. 
 
     best_indices = []
     best_models_lst = []
@@ -209,8 +204,8 @@ def forward_selection(dataset):
     for k, _ in enumerate(lst_pred):
         best_R2 = 0
         for i in lst_pred:
-            # create k_lst, a cumulative list with best combination of indices,
-            # no overlap of indices
+            # create k_lst, a cumulative list with best 
+            # combination of indices, no overlap of indices
             if k > 0:
                 k_lst = list(best_indices[-1])
             else:
