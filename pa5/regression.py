@@ -57,7 +57,7 @@ class Model(object):
         self.training_data = dataset.training_data
         self.testing_data = dataset.testing_data
         self.beta = self.create_beta()
-        self.R2 = self.find_R2(True)
+        self.R2 = self.find_R2(self.training_data)  # R2 using training data
     
     def __repr__(self):
         '''
@@ -69,7 +69,7 @@ class Model(object):
 
         return s
     
-    def create_X(self, training):
+    def create_x(self, data):
         '''
         Creates a matrix of observations where each row is a sample and 
         each column is a predictor variable from the list pred_vars, excluding
@@ -79,17 +79,15 @@ class Model(object):
             training(boolean): true if operating on training data, 
               false otherwise.
         Returns:
-            X: np.array
+            x: np.array
         '''
-        if training:
-            X = self.training_data[:, self.pred_vars]
-        else:
-            X = self.testing_data[:, self.pred_vars]
-        X = util.prepend_ones_column(X)
+        x = data[:, self.pred_vars]
+        x = data[:, self.pred_vars]
+        x = util.prepend_ones_column(x)
 
-        return X
+        return x
     
-    def create_y(self, training):
+    def create_y(self, data):
         '''
         Creates a list of observations for dependent variable y. 
         
@@ -99,10 +97,7 @@ class Model(object):
         Returns:
             y: list
         '''
-        if training:
-            y = self.training_data[:, self.dep_var]
-        else:
-            y = self.testing_data[:, self.dep_var]
+        y = data[:, self.dep_var]
         
         return y
 
@@ -114,13 +109,13 @@ class Model(object):
         Returns:
             beta: a list of coefficients
         '''
-        X = self.create_X(True)
-        y = self.create_y(True)
-        beta_lst = util.linear_regression(X, y)
+        x = self.create_x(self.training_data)
+        y = self.create_y(self.training_data)
+        beta_lst = util.linear_regression(x, y)
 
         return beta_lst
 
-    def find_R2(self, training):
+    def find_R2(self, data):
         '''
         Computes the R2 value of the model.  
         
@@ -130,8 +125,8 @@ class Model(object):
         Returns:
             R_squared: R2 value of the model. 
         '''
-        y = self.create_y(training)
-        y_hat = util.apply_beta(self.beta, self.create_X(training))
+        y = self.create_y(data)
+        y_hat = util.apply_beta(self.beta, self.create_x(data))
         y_bar = np.mean(y)
         R_squared = 1 - (np.sum((y - y_hat) ** 2) / np.sum((y - y_bar) ** 2))
 
@@ -203,9 +198,12 @@ def forward_selection(dataset):
         model where K=1, the second element is the model where K=2, and so on.
     '''
 
-    # create list of list of indices and keep track of index combinations for 
-    # independent variables that yield the highest value of R2 for each K. 
+    # create list of lists of indices to keep track of index combinations for 
+    # independent variables that yield the highest value of R2 for each K, and
+    # a list of models using those indices. 
+
     best_indices = []
+    best_models_lst = []
     lst_pred = dataset.pred_vars[:]
 
     for k, _ in enumerate(lst_pred):
@@ -220,16 +218,18 @@ def forward_selection(dataset):
 
             if i not in k_lst:  
                 k_lst.append(i)
-                k_lst_R2 = Model(dataset, k_lst).R2
+                new_model = Model(dataset, k_lst)
 
-                if k_lst_R2 > best_R2:
-                    best_R2 = k_lst_R2
+                if new_model.R2 > best_R2:
+                    best_R2 = new_model.R2
                     best_k_lst = list(k_lst)
+                    best_model = new_model
 
         # update best_indices per K, so next list can build off of last
-        best_indices.append(best_k_lst)  
+        best_indices.append(best_k_lst)
+        best_models_lst.append(best_model)
         
-    return [Model(dataset, i) for i in best_indices]
+    return best_models_lst
 
 
 def validate_model(dataset, model):
@@ -246,4 +246,4 @@ def validate_model(dataset, model):
         (float) An R2 value
     '''
 
-    return model.find_R2(False)
+    return model.find_R2(dataset.testing_data)
