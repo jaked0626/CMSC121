@@ -120,24 +120,6 @@ class Model(object):
 
         return beta_lst
 
-    def create_y_hat(self, training):
-        '''
-        Finds predicted outcome of dependent variable based on coefficients
-        recorded in self.beta and observations of independent variables recorded
-        in self.create_X(training). 
-        
-        Input: 
-            training(boolean): true if operating on training data, 
-              false otherwise.
-        Returns:
-            y_hat: list of predicted values for dependent variable
-        '''
-        X = self.create_X(training)
-        beta = self.beta
-        y_hat = util.apply_beta(beta, X)
-        
-        return y_hat
-
     def find_R2(self, training):
         '''
         Computes the R2 value of the model.  
@@ -149,7 +131,7 @@ class Model(object):
             R_squared: R2 value of the model. 
         '''
         y = self.create_y(training)
-        y_hat = self.create_y_hat(training)
+        y_hat = util.apply_beta(self.beta, self.create_X(training))
         y_bar = np.mean(y)
         R_squared = 1 - (np.sum((y - y_hat) ** 2) / np.sum((y - y_bar) ** 2))
 
@@ -229,7 +211,7 @@ def forward_selection(dataset):
     for k, _ in enumerate(lst_pred):
         best_R2 = 0
         for i in lst_pred:
-            # create k_lst by extracting last list on best_indices and adding i
+            # create k_lst, a cumulative list with best combination of indices
             if k > 0:
                 k_lst = list(best_indices[-1])
             else: 
