@@ -1,7 +1,7 @@
 '''
 Linear regression
 
-YOUR NAME HERE
+Jake Underland
 
 Main file for linear regression and model selection.
 '''
@@ -50,20 +50,110 @@ class Model(object):
             pred_vars: a list of the indices for the columns (of the
               original data array) used in the model.
         '''
-
-        # REPLACE pass WITH YOUR CODE
-        pass
-
+        
+        self.dep_var = dataset.dependent_var
+        self.pred_vars = pred_vars
+        self.names = dataset.labels
+        self.training_data = dataset.training_data
+        self.testing_data = dataset.testing_data
+        self.beta = self.create_beta()
+        self.R2 = self.find_R2(True)
+    
     def __repr__(self):
         '''
         Format model as a string.
         '''
+        s = "{} ~ {:.6f}".format(self.names[self.dep_var], self.beta[0])
+        for i, index in enumerate(self.pred_vars):
+            s += " + {:.6f} * {}".format(self.beta[i+1], self.names[index])
 
-        # Replace this return statement with one that returns a more
-        # helpful string representation
-        return "!!! You haven't implemented the Model __repr__ method yet !!!"
+        return s
+    
+    def create_X(self, training):
+        '''
+        Creates a matrix of observations where each row is a sample and 
+        each column is a predictor variable from the list pred_vars, excluding
+        the first column which is all ones.
+        
+        Input: 
+            training(boolean): true if operating on training data, 
+              false otherwise.
+        Returns:
+            X: np.array
+        '''
+        if training:
+            X = self.training_data[:, self.pred_vars]
+        else:
+            X = self.testing_data[:, self.pred_vars]
+        X = util.prepend_ones_column(X)
 
-    ### Additional methods here
+        return X
+    
+    def create_y(self, training):
+        '''
+        Creates a list of observations for dependent variable y. 
+        
+        Input: 
+            training(boolean): true if operating on training data, 
+              false otherwise.
+        Returns:
+            y: list
+        '''
+        if training:
+            y = self.training_data[:, self.dep_var]
+        else:
+            y = self.testing_data[:, self.dep_var]
+        
+        return y
+
+    
+    def create_beta(self):
+        '''
+        Runs a linear regression using the observations of the independent
+        variables and the dependent variable and returns a list of coefficients.
+        Returns:
+            beta: a list of coefficients
+        '''
+        X = self.create_X(True)
+        y = self.create_y(True)
+        beta_lst = util.linear_regression(X, y)
+
+        return beta_lst
+
+    def create_y_hat(self, training):
+        '''
+        Finds predicted outcome of dependent variable based on coefficients
+        recorded in self.beta and observations of independent variables recorded
+        in self.create_X(training). 
+        
+        Input: 
+            training(boolean): true if operating on training data, 
+              false otherwise.
+        Returns:
+            y_hat: list of predicted values for dependent variable
+        '''
+        X = self.create_X(training)
+        beta = self.beta
+        y_hat = util.apply_beta(beta, X)
+        
+        return y_hat
+
+    def find_R2(self, training):
+        '''
+        Computes the R2 value of the model.  
+        
+        Input: 
+            training(boolean): true if operating on training data, 
+              false otherwise.
+        Returns:
+            R_squared: R2 value of the model. 
+        '''
+        y = self.create_y(training)
+        y_hat = self.create_y_hat(training)
+        y_bar = np.mean(y)
+        R_squared = 1 - (np.sum((y - y_hat) ** 2) / np.sum((y - y_bar) ** 2))
+
+        return R_squared
 
 
 def compute_single_var_models(dataset):
@@ -77,8 +167,7 @@ def compute_single_var_models(dataset):
         List of Model objects, each representing a single-variable model
     '''
 
-    # Replace [] with the list of models
-    return []
+    return [Model(dataset, [i]) for i in dataset.pred_vars]
 
 
 def compute_all_vars_model(dataset):
@@ -91,9 +180,8 @@ def compute_all_vars_model(dataset):
     Returns:
         A Model object that uses all the predictor variables
     '''
-
-    # Replace None with a model object
-    return None
+    pred_vars = dataset.pred_vars
+    return Model(dataset, pred_vars)
 
 
 def compute_best_pair(dataset):
@@ -106,9 +194,18 @@ def compute_best_pair(dataset):
     Returns:
         A Model object for the best bivariate model
     '''
+    lst_pred = dataset.pred_vars[:]
+    # initialize best bivariate model to the first possible combination of
+    # predictor variables
+    best_biv = Model(dataset, lst_pred[0:2])
 
-    # Replace None with a model object
-    return None
+    for i in lst_pred:
+        for j in range(i + 1, lst_pred[-1] + 1):
+            new_biv = Model(dataset, [i, j])
+            if new_biv.R2 > best_biv.R2:
+                best_biv = new_biv
+
+    return best_biv
 
 
 def forward_selection(dataset):
@@ -123,7 +220,33 @@ def forward_selection(dataset):
         A list (of length P) of Model objects. The first element is the
         model where K=1, the second element is the model where K=2, and so on.
     '''
-    return []
+
+    # create list of list of indices and keep track of index combinations for 
+    # independent variables that yield the highest value of R2 for each K. 
+    best_indices = []
+    lst_pred = dataset.pred_vars[:]
+    P = len(lst_pred)
+
+    for k in range(P):
+        best_R2 = 0
+        for i in lst_pred:
+            # create k_lst, a cumulative list with best combination of indices
+            if k == 0:
+                k_lst = []
+            else:
+                k_lst = list(best_indices[-1])
+            if i not in k_lst:  # no two of the same indices in one list
+                k_lst.append(i)
+                k_lst_R2 = Model(dataset, k_lst).R2
+                if k_lst_R2 > best_R2:
+                    best_R2 = k_lst_R2
+                    best_k_lst = list(k_lst)
+
+        # update best_indices per K, so next list can build off of last
+        best_indices.append(best_k_lst)  
+        
+    
+    return [Model(dataset, i) for i in best_indices]
 
 
 def validate_model(dataset, model):
@@ -132,7 +255,7 @@ def validate_model(dataset, model):
     compute the R2 of applying that model to the testing data.
 
     Inputs:
-        dataset: (DataSet object) a dataset
+        dataset: (DataSet object) a dataset (unused)
         model: (Model object) A model that must have been trained
            on the dataset's training data.
 
@@ -140,5 +263,4 @@ def validate_model(dataset, model):
         (float) An R2 value
     '''
 
-    # Replace 0.0 with the correct R2 value
-    return 0.0
+    return model.find_R2(False)
