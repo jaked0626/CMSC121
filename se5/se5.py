@@ -17,7 +17,7 @@ def compute_matching(x, y):
              x and y
     """
 
-    pass
+    return x == y
 
 
 def compute_matching_indices(x, y):
@@ -37,8 +37,8 @@ def compute_matching_indices(x, y):
     Note that the returned array must be one-dimensional! 
 
     """
-
-    pass
+    new_x = np.argwhere(x == y)
+    return new_x.flatten()
 
 
 def powers(N, p):
@@ -54,7 +54,8 @@ def powers(N, p):
     Returns: an array consisting of powers of p
     """
 
-    pass
+    powers = np.arange(N)
+    return p ** powers
 
 
 def clip_values(x, min_val=None, max_val=None):
@@ -75,8 +76,13 @@ def clip_values(x, min_val=None, max_val=None):
              to (min_val, max-val)
 
     """
+    new_x  = x.copy()
+    if min_val is not None:
+        new_x[x < min_val] = min_val
+    if max_val is not None:
+        new_x[x > max_val] = max_val
 
-    pass
+    return new_x
 
 
 def find_closest_value(x, tgt_value):
@@ -94,8 +100,9 @@ def find_closest_value(x, tgt_value):
     Returns: scalar value in x closest to tgt_value
 
     """
-
-    pass
+    y = (x - tgt_value) ** 2
+    
+    return x[y.argmin()]
 
 
 def select_row_col(x, is_row, tgt):
@@ -114,5 +121,10 @@ def select_row_col(x, is_row, tgt):
          the rows or columns as requested
     """
 
-    pass
+    if is_row:
+        new = x[tgt,:]
+    else:
+        new = x[:,tgt]
+
+    return new
 
