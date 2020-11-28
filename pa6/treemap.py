@@ -68,7 +68,7 @@ class Rectangle:
     Simple class for representing rectangles
     '''
 
-    def __init__(self, origin, size, label="", color_code=()):
+    def __init__(self, origin, size, label="", color_code=("",)):
         # Validate parameters
         validate_tuple_param(origin, "origin")
         validate_tuple_param(origin, "size")
@@ -199,7 +199,7 @@ def sorted_trees(tree_list):
     return sorted(tree_list, key=lambda t: (-t.value, t.key))
 
 
-def compute_row(bounding_rec, row_data, total_sum, margin=0.0):
+def compute_row(bounding_rec, row_data, total_sum):
     '''
     Lay out the given data points as rectangles in one row of a
     treemap. The row will be against the left or top edge of the
@@ -222,10 +222,10 @@ def compute_row(bounding_rec, row_data, total_sum, margin=0.0):
     '''
 
     if bounding_rec.width >= bounding_rec.height:
-        return __compute_row_wide(bounding_rec, row_data, total_sum, margin)
+        return __compute_row_wide(bounding_rec, row_data, total_sum)
     else:
         row_layout_t, leftover_t = __compute_row_wide(
-            __transpose_rectangle(bounding_rec), row_data, total_sum, margin)
+            __transpose_rectangle(bounding_rec), row_data, total_sum)
         row_layout = [(__transpose_rectangle(rec), tr)
             for rec, tr in row_layout_t]
         leftover = __transpose_rectangle(leftover_t)
@@ -248,7 +248,7 @@ def __transpose_rectangle(rec):
         rec.label, rec.color_code)
 
 
-def __compute_row_wide(bounding_rec, row_data, total_sum, margin):
+def __compute_row_wide(bounding_rec, row_data, total_sum):
     '''
     Helper function for compute_row. Serves the same purpose as compute_row,
     but only when the bounding rectangle is at least as wide as it is tall.
@@ -266,8 +266,8 @@ def __compute_row_wide(bounding_rec, row_data, total_sum, margin):
     y = bounding_rec.y
     for t in row_data:
         height = bounding_rec.height * t.value / row_sum
-        rec = Rectangle((bounding_rec.x + margin, y + margin),
-                        (row_width - 2 * margin, height - 2 * margin))
+        rec = Rectangle((bounding_rec.x, y),
+                        (row_width, height))
         if rec.width > 0 and rec.height > 0:
             row_layout.append((rec, t))
         y += height
