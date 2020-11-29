@@ -1,5 +1,6 @@
 import sys
 import os
+import pytest
 
 # Handle the fact that the test code may not
 # be in the same directory as the solution code
@@ -72,6 +73,15 @@ def check_equals(actual, expected, recreate_msg=None):
 
     assert actual == expected, msg
 
+def check_parameter_unmodified(actual, expected, param, recreate_msg=None):
+    msg = ("Parameter {} has been modified:\n"
+        "Actual ({}) and original ({}) values of {}" 
+        "do not match.").format(param, param, actual, expected)
+    if recreate_msg is not None:
+        msg += "\n" + recreate_msg
+
+    assert actual == expected, msg
+
 def pretty_print_repr(x):
     return repr(x)
 
@@ -94,6 +104,66 @@ def gen_recreate_msg_by_lines(lines):
     recreate_msg += "  " + "\n  ".join(lines)
     return recreate_msg
 
+def check_tree_unmodified(t, expected_t, recreate_msg):
+    expected_attributes = vars(expected_t)
+
+    node_error_prefix = "Checking a node with " + ", ".join(
+        ["{}={}".format(attr, repr(getattr(t, attr, "[not assigned]")))
+        for attr in expected_attributes if attr != 'children']) + \
+        "\nTree has been modified:\n"
+
+    for attr in expected_attributes:
+        assert hasattr(t, attr), \
+            node_error_prefix + \
+            "Node is missing attribute {}.\n".format(attr) + \
+            recreate_msg
+
+        if attr != 'children':
+            assert getattr(t, attr) == getattr(expected_t, attr), \
+            node_error_prefix + ("Node has incorrect {}. "
+                "Got {}, expected {}.\n").format(attr,
+                repr(getattr(t, attr)), repr(getattr(expected_t, attr))) + \
+                recreate_msg
+    
+    expected_attributes_set = set(expected_attributes.keys())
+    actual_attributes_set = set(vars(t).keys())
+    assert actual_attributes_set == expected_attributes_set, \
+            node_error_prefix + \
+            "Node has extra attributes {}.\n".format(
+                ", ".join(actual_attributes_set - expected_attributes_set)) + \
+            recreate_msg
+
+
+    children = list(t.children)
+    expected_children = list(expected_t.children)
+
+    if expected_children == []:
+        assert children == [], node_error_prefix + \
+            "Expected node to have no children, but it has children.\n" + \
+            recreate_msg
+    else:
+        for c in children:
+            assert isinstance(c, Tree), node_error_prefix + \
+                "Node has a child that is not a Tree: {}\n".format(c) + \
+                recreate_msg
+
+        # This assumes no node has two children with the same key
+        sorted_children = sorted(children, key=lambda st: st.key)
+        sorted_expected_children = sorted(
+            expected_children, key=lambda st: st.key)
+        keys = [c.key for c in sorted_children]
+        expected_keys = [c.key for c in sorted_expected_children]
+
+
+        assert keys == expected_keys, node_error_prefix + \
+            "Expected node to have children with keys {} " \
+            "but the children's keys are {}.\n".format(expected_keys, keys) + \
+            recreate_msg
+
+        for child, expected_child in zip(sorted_children,
+                                         sorted_expected_children):
+            check_tree_unmodified(child, expected_child, recreate_msg)
+
 # # #
 #
 # TEST HELPERS
@@ -109,31 +179,39 @@ def do_test_sum_cubes(n):
     check_equals(actual, expected, recreate_msg)
 
 def do_test_sublists(lst):
-    recreate_msg = gen_recreate_msg(MODULE, 'sublists', lst)
-    actual = se6.sublists(lst)
+    original_lst = list(lst)
+    recreate_msg = gen_recreate_msg(MODULE, 'sublists', original_lst)
     expected = [[x for j, x in enumerate(lst) if i ^ (2 ** j) < i] 
         for i in range(2 ** len(lst))]
+    actual = se6.sublists(lst)
     check_none(actual, recreate_msg)
     check_type(actual, expected, recreate_msg)
     for el in actual:
         check_type(el, [], recreate_msg)
     check_equals(sorted(actual), sorted(expected), recreate_msg)
+    check_parameter_unmodified(lst, original_lst, "lst", recreate_msg)
 
-def do_test_min_depth_leaf(tree_name, expected):
+def do_test_min_depth_leaf(trees_and_original_trees, tree_name, expected):
+    trees, original_trees = trees_and_original_trees
     recreate_msg = gen_recreate_msg_with_trees(
         MODULE, 'min_depth_leaf', tree_name)
     actual = se6.min_depth_leaf(trees[tree_name])
     check_none(actual, recreate_msg)
     check_type(actual, expected, recreate_msg)
     check_equals(actual, expected, recreate_msg)
+    check_tree_unmodified(trees[tree_name], original_trees[tree_name], 
+                          recreate_msg)
 
-def do_test_repeated_value(tree_name, expected):
+def do_test_repeated_value(trees_and_original_trees, tree_name, expected):
+    trees, original_trees = trees_and_original_trees
     recreate_msg = gen_recreate_msg_with_trees(
         MODULE, 'repeated_value', tree_name)
     actual = se6.repeated_value(trees[tree_name])
     check_none(actual, recreate_msg)
     check_type(actual, expected, recreate_msg)
     check_equals(actual, expected, recreate_msg)
+    check_tree_unmodified(trees[tree_name], original_trees[tree_name], 
+                          recreate_msg)
 
 # # #
 #
@@ -148,7 +226,7 @@ def test_sum_cubes_2():
     do_test_sum_cubes(9)
 
 def test_sum_cubes_3():
-    pass # removed
+    pass
 
 def test_sum_cubes_4():
     do_test_sum_cubes(50)
@@ -171,35 +249,35 @@ def test_sublists_4():
 def test_sublists_5():
     do_test_sublists(list(range(0, 70, 10)))
 
-def test_min_depth_leaf_1():
-    do_test_min_depth_leaf("tree_1", 1)
+def test_min_depth_leaf_1(trees_min_depth_leaf):
+    do_test_min_depth_leaf(trees_min_depth_leaf, "tree_1", 1)
 
-def test_min_depth_leaf_2():
-    do_test_min_depth_leaf("tree_2", 1)
+def test_min_depth_leaf_2(trees_min_depth_leaf):
+    do_test_min_depth_leaf(trees_min_depth_leaf, "tree_2", 1)
 
-def test_min_depth_leaf_3():
-    do_test_min_depth_leaf("tree_3", 5)
+def test_min_depth_leaf_3(trees_min_depth_leaf):
+    do_test_min_depth_leaf(trees_min_depth_leaf, "tree_3", 5)
     
-def test_min_depth_leaf_4():
-    do_test_min_depth_leaf("tree_4", 4)
+def test_min_depth_leaf_4(trees_min_depth_leaf):
+    do_test_min_depth_leaf(trees_min_depth_leaf, "tree_4", 4)
     
-def test_min_depth_leaf_5():
-    do_test_min_depth_leaf("tree_5", 3)
+def test_min_depth_leaf_5(trees_min_depth_leaf):
+    do_test_min_depth_leaf(trees_min_depth_leaf, "tree_5", 3)
 
-def test_repeated_value_1():
-    do_test_repeated_value("tree_1", False)
+def test_repeated_value_1(trees_repeated_value):
+    do_test_repeated_value(trees_repeated_value, "tree_1", False)
 
-def test_repeated_value_2():
-    do_test_repeated_value("tree_2", True)
+def test_repeated_value_2(trees_repeated_value):
+    do_test_repeated_value(trees_repeated_value, "tree_2", True)
 
-def test_repeated_value_3():
-    do_test_repeated_value("tree_3", False)
+def test_repeated_value_3(trees_repeated_value):
+    do_test_repeated_value(trees_repeated_value, "tree_3", False)
 
-def test_repeated_value_4():
-    do_test_repeated_value("tree_4", False)
+def test_repeated_value_4(trees_repeated_value):
+    do_test_repeated_value(trees_repeated_value, "tree_4", False)
 
-def test_repeated_value_5():
-    do_test_repeated_value("tree_5", True)
+def test_repeated_value_5(trees_repeated_value):
+    do_test_repeated_value(trees_repeated_value, "tree_5", True)
 
 # # #
 #
@@ -207,4 +285,22 @@ def test_repeated_value_5():
 #
 # # #
 
-trees = util.load_trees("sample_trees.json")
+
+@pytest.fixture(scope="session")
+def trees_min_depth_leaf():
+    """
+    Fixture for loading the trees for min_depth_leaf
+    """
+    return get_trees()
+
+@pytest.fixture(scope="session")
+def trees_repeated_value():
+    """
+    Fixture for loading the trees for repeated_value
+    """
+    return get_trees()
+
+def get_trees():
+    trees = util.load_trees("sample_trees.json")
+    original_trees = util.load_trees("sample_trees.json")
+    return trees, original_trees
