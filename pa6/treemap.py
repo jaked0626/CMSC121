@@ -95,7 +95,7 @@ class Rectangle:
         return str(self)
 
 
-def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
+def compute_rectangles(t, origin=(0.0,0.0), bounding_rec_width=1.0, bounding_rec_height=1.0):
     '''
     Computes the rectangles for drawing a treemap of the provided tree.
 
@@ -106,18 +106,33 @@ def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
 
     Returns: a list of Rectangle objects.
     '''
+    compute_internal_values(t)
+    compute_paths(t)
 
+    #if t.num_children() == 0:  # if t is a leaf, it is not a subtree so no rectangle computation
+        #return []
+        #pass
+
+    #else:
     trees_descend = sorted_trees(t.children)
-    bounding_rec = Rectangle((0.0, 0.0), 
-                             (bounding_rec_width, bounding_rec_height))
-    #total_sum = sum([tree.value for tree in trees_descend])
+    bounding_rec = Rectangle(origin, 
+                            (bounding_rec_width, bounding_rec_height))
     lst_recs = []
 
     for pair in help_compute_rectangles(trees_descend, 
-                                        bounding_rec):
+                                            bounding_rec):
         rec, tree = pair
         rec.label = tree.key
-        lst_recs.append(rec)
+        rec.color_code = tree.path
+        
+        if tree.num_children() > 0:
+            lst_recs = lst_recs + compute_rectangles(tree, (rec.x, rec.y), rec.width, rec.height)
+        else:
+            lst_recs.append(rec)
+        #lst_recs += compute_rectangles(tree, (rec.x, rec.y), rec.width, rec.height)
+            
+
+        #lst_recs = lst_recs + compute_rectangles(tree, (rec.x, rec.y), rec.width, rec.height)
 
     return lst_recs
 
@@ -127,39 +142,38 @@ def help_compute_rectangles(lst_of_trees, bounding_rec):
     lst of trees in descending order by value
     bounding rectangle in which to fit rows
     """
-
-    new_lst_of_trees = None
     total_sum = sum([tree.value for tree in lst_of_trees])
+    new_lst_of_trees = []
 
+    # base case, if area of bounding rectangle is 0
+    if bounding_rec.width * bounding_rec.height == 0:
+        return []
+
+    # recursive case, complete one row, then call function again. 
     for k, _ in enumerate(lst_of_trees):
         row_layout, leftover = compute_row(bounding_rec, 
                                            lst_of_trees[:k+1], total_sum)  # compute list of rectangles for each k 
-        kth_rec, kth_tree = row_layout[-1]
+        kth_rec, _ = row_layout[-1]
         new_aspect_ratio = max(kth_rec.height, kth_rec.width)\
                            / min(kth_rec.height, kth_rec.width)
 
-        if k == 0:  # k == 0
+        if k == 0:
             previous_aspect_ratio = new_aspect_ratio
             final_row_layout = row_layout
             final_leftover = leftover
-            left_over_sum = sum([tree.value for tree in lst_of_trees[k+1:]])
 
-        else:  # k >= 1 
+        else:  # k >= 1
 
             if previous_aspect_ratio >= new_aspect_ratio:
                 previous_aspect_ratio = new_aspect_ratio
                 final_row_layout = row_layout
                 final_leftover = leftover
-                left_over_sum = sum([tree.value for tree in lst_of_trees[k+1:]])
                 
             else:  # stop row
                 new_lst_of_trees = lst_of_trees[k:]
-                break  # we have found one row
+                break
     
-    if new_lst_of_trees is None:
-        return final_row_layout
-    else:
-        return final_row_layout + help_compute_rectangles(new_lst_of_trees, 
+    return final_row_layout + help_compute_rectangles(new_lst_of_trees, 
                                                           final_leftover)
         
  
