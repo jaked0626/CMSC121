@@ -35,9 +35,7 @@ def compute_internal_values(t):
         t.value)
     '''
 
-    if t.num_children() == 0:
-        t.value = t.value  # for leaves, t.value is already assigned
-    else:
+    if t.num_children() > 0:
         t.value = sum([compute_internal_values(child) for child in t.children])
     
     return t.value
@@ -61,22 +59,11 @@ def compute_paths(t, prefix=()):
         Nothing. The input tree t should be modified to contain a path
             attribute for all nodes.
     '''
-    if t.num_children() == 0:
-        pass
-    else:
+    if t.num_children() > 0:
         t.path = prefix
         for child in t.children:
             child.path = prefix + (t.key,)
             compute_paths(child, child.path)
-
-    '''
-    if t.num_children() == 0:
-        pass
-    else:
-        for child in t.children:
-            child.path = t.path + prefix + (t.key,)
-            compute_paths(child, prefix)
-    '''
 
 
 class Rectangle:
