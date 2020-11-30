@@ -95,7 +95,7 @@ class Rectangle:
         return str(self)
 
 
-def compute_rectangles(t, origin=(0.0,0.0), bounding_rec_width=1.0, bounding_rec_height=1.0):
+def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
     '''
     Computes the rectangles for drawing a treemap of the provided tree.
 
@@ -109,13 +109,8 @@ def compute_rectangles(t, origin=(0.0,0.0), bounding_rec_width=1.0, bounding_rec
     compute_internal_values(t)
     compute_paths(t)
 
-    #if t.num_children() == 0:  # if t is a leaf, it is not a subtree so no rectangle computation
-        #return []
-        #pass
-
-    #else:
     trees_descend = sorted_trees(t.children)
-    bounding_rec = Rectangle(origin, 
+    bounding_rec = Rectangle((0.0, 0.0), 
                             (bounding_rec_width, bounding_rec_height))
     lst_recs = []
 
@@ -123,16 +118,8 @@ def compute_rectangles(t, origin=(0.0,0.0), bounding_rec_width=1.0, bounding_rec
                                             bounding_rec):
         rec, tree = pair
         rec.label = tree.key
-        rec.color_code = tree.path
-        
-        if tree.num_children() > 0:
-            lst_recs = lst_recs + compute_rectangles(tree, (rec.x, rec.y), rec.width, rec.height)
-        else:
-            lst_recs.append(rec)
-        #lst_recs += compute_rectangles(tree, (rec.x, rec.y), rec.width, rec.height)
-            
-
-        #lst_recs = lst_recs + compute_rectangles(tree, (rec.x, rec.y), rec.width, rec.height)
+        rec.color_code = tree.path  # because compute_paths is called each time, and compute_paths initializes path with parent's key, not path
+        lst_recs.append(rec)
 
     return lst_recs
 
@@ -142,17 +129,21 @@ def help_compute_rectangles(lst_of_trees, bounding_rec):
     lst of trees in descending order by value
     bounding rectangle in which to fit rows
     """
-    total_sum = sum([tree.value for tree in lst_of_trees])
+    trees_descend = sorted_trees(lst_of_trees)
+    total_sum = sum([tree.value for tree in trees_descend])
     new_lst_of_trees = []
+    lst_of_pairs = []
+    final_row_layout = []
+    final_leftover = Rectangle((0.0, 0.0), (0.0, 0.0))
 
     # base case, if area of bounding rectangle is 0
     if bounding_rec.width * bounding_rec.height == 0:
         return []
 
     # recursive case, complete one row, then call function again. 
-    for k, _ in enumerate(lst_of_trees):
+    for k, _ in enumerate(trees_descend):
         row_layout, leftover = compute_row(bounding_rec, 
-                                           lst_of_trees[:k+1], total_sum)  # compute list of rectangles for each k 
+                                           trees_descend[:k+1], total_sum)  # compute list of rectangles for each k 
         kth_rec, _ = row_layout[-1]
         new_aspect_ratio = max(kth_rec.height, kth_rec.width)\
                            / min(kth_rec.height, kth_rec.width)
@@ -161,6 +152,7 @@ def help_compute_rectangles(lst_of_trees, bounding_rec):
             previous_aspect_ratio = new_aspect_ratio
             final_row_layout = row_layout
             final_leftover = leftover
+         
 
         else:  # k >= 1
 
@@ -169,12 +161,22 @@ def help_compute_rectangles(lst_of_trees, bounding_rec):
                 final_row_layout = row_layout
                 final_leftover = leftover
                 
+                
             else:  # stop row
-                new_lst_of_trees = lst_of_trees[k:]
+                new_lst_of_trees = trees_descend[k:]
                 break
     
-    return final_row_layout + help_compute_rectangles(new_lst_of_trees, 
-                                                          final_leftover)
+    final_row_layout = final_row_layout +\
+                       help_compute_rectangles(new_lst_of_trees, final_leftover)
+
+    for pair in final_row_layout:
+        rec, tree = pair
+        if tree.num_children() > 0:
+            lst_of_pairs = lst_of_pairs + help_compute_rectangles(tree.children, rec)
+        else:
+            lst_of_pairs.append(pair)
+    
+    return lst_of_pairs
         
  
 
