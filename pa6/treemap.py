@@ -108,13 +108,11 @@ def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
     '''
     compute_internal_values(t)
     compute_paths(t)
-
-    trees_descend = sorted_trees(t.children)
     bounding_rec = Rectangle((0.0, 0.0), 
                             (bounding_rec_width, bounding_rec_height))
     lst_recs = []
 
-    for pair in help_compute_rectangles(trees_descend, 
+    for pair in help_compute_rectangles(t.children, 
                                             bounding_rec):
         rec, tree = pair
         rec.label = tree.key
@@ -134,6 +132,7 @@ def help_compute_rectangles(lst_of_trees, bounding_rec):
     new_lst_of_trees = []
     lst_of_pairs = []
     final_row_layout = []
+    #aspect_ratio_lst = []
     final_leftover = Rectangle((0.0, 0.0), (0.0, 0.0))
 
     # base case, if area of bounding rectangle is 0
@@ -147,22 +146,28 @@ def help_compute_rectangles(lst_of_trees, bounding_rec):
         kth_rec, _ = row_layout[-1]
         new_aspect_ratio = max(kth_rec.height, kth_rec.width)\
                            / min(kth_rec.height, kth_rec.width)
+        print(new_aspect_ratio, k)
 
         if k == 0:
-            previous_aspect_ratio = new_aspect_ratio
+            #aspect_ratio_lst.append(new_aspect_ratio)
             final_row_layout = row_layout
             final_leftover = leftover
-         
 
         else:  # k >= 1
+            distortion_previous_k = max([(max(pair[0].height, pair[0].width)\
+                           / min(pair[0].height, pair[0].width)) for pair in final_row_layout])
+            #aspect_ratio_lst.append(new_aspect_ratio)
+            distortion_k = max([(max(pair[0].height, pair[0].width)\
+                           / min(pair[0].height, pair[0].width)) for pair in row_layout])
 
-            if previous_aspect_ratio >= new_aspect_ratio:
-                previous_aspect_ratio = new_aspect_ratio
+            if distortion_previous_k >= distortion_k:
+                print(distortion_previous_k, ">", distortion_k)
+                #previous_aspect_ratio = new_aspect_ratio
                 final_row_layout = row_layout
                 final_leftover = leftover
                 
-                
             else:  # stop row
+                print(distortion_previous_k, "<", distortion_k)
                 new_lst_of_trees = trees_descend[k:]
                 break
     
