@@ -52,12 +52,20 @@
 | 5.1 - Introduction to NumPy                       |        96 |                  1 |                    1 |       |
 | 5.2 - Creating NumPy Arrays                       |        96 |                  0 |                    1 |       |
 | 5.3 - Array Indexing Basics                       |        92 |                  1 |                    1 |       |
-| 5.4 - Working with Arrays                         |        95 |                  1 |                    1 |       |
+| 5.4 - Working with Arrays                         |        96 |                  1 |                    1 |       |
 | 5.5 - Advanced Array Manipulations                |        98 |                  1 |                    1 |       |
 | 5.6 - Extended Example: Standardizing Features    |       100 |                  1 |                    1 |       |
-| **TOTAL**                                         |           |                 60 |                   61 |       |
+| 6.0 - Overview of Module M6                       |         0 |                    |                      |       |
+| 6.1 - Meet the Instructor                         |       100 |                    |                      |       |
+| 6a.1 - Introduction to Recursion                  |        99 |                  1 |                    1 |       |
+| 6a.2 - Anatomy of a Recursive Function Call       |        62 |                  1 |                    1 |       |
+| 6a.3 - How to Think Recursively                   |        99 |                  1 |                    1 |       |
+| 6a.4 - Binary Search                              |        93 |                  1 |                    1 |       |
+| 6b.1 - Introduction to Trees                      |       100 |                  1 |                    1 |       |
+| 6b.2 - Using Trees                                |       100 |                  1 |                    1 |       |
+| **TOTAL**                                         |           |                 66 |                   67 |       |
 
-You scored 98.36% of the quiz questions correctly.
+You scored 98.51% of the quiz questions correctly.
 
 Since this is above 75%, you earn the full 5 points allocated to the quizzes.
 
