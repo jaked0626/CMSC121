@@ -37,7 +37,7 @@ def compute_internal_values(t):
 
     if t.num_children() > 0:
         t.value = sum([compute_internal_values(child) for child in t.children])
-    
+
     return t.value
 
 def compute_paths(t, prefix=()):
@@ -59,11 +59,9 @@ def compute_paths(t, prefix=()):
         Nothing. The input tree t should be modified to contain a path
             attribute for all nodes.
     '''
-    if t.num_children() > 0:
-        t.path = prefix
-        for child in t.children:
-            child.path = prefix + (t.key,)
-            compute_paths(child, child.path)
+    t.path = prefix
+    for child in t.children:
+        compute_paths(child, t.path + (t.key,))
 
 
 class Rectangle:
@@ -108,15 +106,14 @@ def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
     '''
     compute_internal_values(t)
     compute_paths(t)
-    bounding_rec = Rectangle((0.0, 0.0), 
+    bounding_rec = Rectangle((0.0, 0.0),
                             (bounding_rec_width, bounding_rec_height))
     lst_recs = []
 
-    for pair in help_compute_rectangles(t.children, 
-                                            bounding_rec):
-        rec, tree = pair
-        rec.label = tree.key
-        rec.color_code = tree.path
+    for pair in help_compute_rectangles(t.children, bounding_rec):
+        rec, tr = pair
+        rec.label = tr.key
+        rec.color_code = tr.path
         lst_recs.append(rec)
 
     return lst_recs
@@ -124,59 +121,51 @@ def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
 
 def help_compute_rectangles(lst_of_trees, bounding_rec):
     """
-    lst of trees in descending order by value
+    lst of trees
     bounding rectangle in which to fit rows
     """
+    # base case, if area of bounding rectangle is 0
+    #if bounding_rec.width * bounding_rec.height == 0:
+    if lst_of_trees == []:  # faster
+        return []
+    
     trees_descend = sorted_trees(lst_of_trees)
     total_sum = sum([tree.value for tree in trees_descend])
-    new_lst_of_trees = []
+    trees_for_next_row = []
     lst_of_pairs = []
-    final_row_layout = []
-    final_leftover = Rectangle((0.0, 0.0), (0.0, 0.0))
 
-    # base case, if area of bounding rectangle is 0
-    if bounding_rec.width * bounding_rec.height == 0:
-        return []
-
-    # recursive case, complete one row, then call function again. 
+    # recursive case, complete one row, then call function again.
     for k, _ in enumerate(trees_descend):
-        row_layout, leftover = compute_row(bounding_rec, 
-                                           trees_descend[:k+1], total_sum)  # compute list of rectangles for each k 
+        row_layout_k, leftover_k = compute_row(bounding_rec,
+                                               trees_descend[:k+1], total_sum)
+        distortion_k = max([(max(pair[0].height, pair[0].width)
+                           / min(pair[0].height, pair[0].width))
+                           for pair in row_layout_k])
+        if k == 0 or distortion_previous_k >= distortion_k:  # proceed to next k
+            row_layout_previous_k = row_layout_k
+            leftover_previous_k = leftover_k
+            distortion_previous_k = distortion_k
+        else:  # stop row
+            trees_for_next_row = trees_descend[k:]
+            break
 
-        if k == 0:
-            final_row_layout = row_layout
-            final_leftover = leftover
+    final_rows_layout = row_layout_previous_k +\
+                        help_compute_rectangles(trees_for_next_row,
+                                                leftover_previous_k)
 
-        else:  # k >= 1
-            distortion_previous_k = max([(max(pair[0].height, pair[0].width)
-                           / min(pair[0].height, pair[0].width)) 
-                           for pair in final_row_layout])
-            distortion_k = max([(max(pair[0].height, pair[0].width)
-                           / min(pair[0].height, pair[0].width)) 
-                           for pair in row_layout])
+#### below is multilevel. Factor out to separate function? solves too many variables issue
 
-            if distortion_previous_k >= distortion_k:
-                final_row_layout = row_layout
-                final_leftover = leftover
-                
-            else:  # stop row
-                new_lst_of_trees = trees_descend[k:]
-                break
-    
-    final_row_layout = final_row_layout +\
-                       help_compute_rectangles(new_lst_of_trees,final_leftover)
-
-    for pair in final_row_layout:
-        rec, tree = pair
-        if tree.num_children() > 0:
+    for pair in final_rows_layout:
+        rec, tr = pair
+        if tr.num_children() > 0:
             lst_of_pairs = lst_of_pairs +\
-                           help_compute_rectangles(tree.children, rec)
+                           help_compute_rectangles(tr.children, rec)
         else:
             lst_of_pairs.append(pair)
-    
+
     return lst_of_pairs
-        
- 
+
+
 
 
 
