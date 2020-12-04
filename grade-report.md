@@ -18,14 +18,14 @@ You have 2 late submissions left
 Short Exercises
 ===============
 
-|  Short Exercises   |     Score      |
-|--------------------|----------------|
-| Short Exercises #1 |            100 |
-| Short Exercises #2 |            100 |
-| Short Exercises #3 |            100 |
-| Short Exercises #4 |            100 |
-| Short Exercises #5 |            100 |
-| Short Exercises #6 | Not graded yet |
+|  Short Exercises   | Score |
+|--------------------|------:|
+| Short Exercises #1 |   100 |
+| Short Exercises #2 |   100 |
+| Short Exercises #3 |   100 |
+| Short Exercises #4 |   100 |
+| Short Exercises #5 |   100 |
+| Short Exercises #6 |   100 |
 
 
 Timed Assessments
@@ -50,19 +50,19 @@ Total
 ---
 
 **NOTE**: There is still ungraded work, which means the maximum
-number of possible points is currently 55.83
+number of possible points is currently 58.33
 
 ---
 
 |                         | Points Obtained | Points Possible (so far) | Maximum Points |
 |-------------------------|----------------:|-------------------------:|---------------:|
 | Programming Assignments |           32.25 |                    33.33 |             50 |
-| Short Exercises         |           12.50 |                    12.50 |             15 |
+| Short Exercises         |           15.00 |                    15.00 |             15 |
 | Timed Assessments       |            4.95 |                     5.00 |             30 |
 | Quizzes                 |            5.00 |                     5.00 |              5 |
-| **TOTAL**               |           54.70 |                    55.83 |            100 |
+| **TOTAL**               |           57.20 |                    58.33 |            100 |
 
-Your total score (out of 100) is 97.97
+Your total score (out of 100) is 98.06
 
 Estimated grade: A
 
