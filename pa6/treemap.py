@@ -1,7 +1,7 @@
 '''
 CS 121: PA 6 - Avian Biodiversity Treemap
 
-YOUR NAME HERE
+Jake Underland
 
 Code for constructing a treemap.
 '''
@@ -110,8 +110,7 @@ def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
                             (bounding_rec_width, bounding_rec_height))
     lst_recs = []
 
-    for pair in help_compute_rectangles(t.children, bounding_rec):
-        rec, tr = pair
+    for rec, tr in help_compute_rectangles(t.children, bounding_rec):
         rec.label = tr.key
         rec.color_code = tr.path
         lst_recs.append(rec)
@@ -120,51 +119,71 @@ def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
 
 
 def help_compute_rectangles(lst_of_trees, bounding_rec):
-    """
-    lst of trees
-    bounding rectangle in which to fit rows
-    """
-    # base case, if area of bounding rectangle is 0
-    #if bounding_rec.width * bounding_rec.height == 0:
-    if lst_of_trees == []:  # faster
-        return []
-    
+    '''
+    Helper function that, given a list of trees and the bounding rectangle,
+    fits all the **leaves** from the list as rectangles and returns a list of
+    tuples with rectangles and the corresponding leaves, following the formula
+    for mapping rectangles.
+
+    Inputs:
+        lst_of_trees(list): a list of trees
+        bounding_rec(Rectangle): the bounding rectangle
+
+    Returns:
+        lst_of_pairs (list): a list of tuples containing the rectangle
+          and corresponding leaf.
+    '''
     trees_descend = sorted_trees(lst_of_trees)
     total_sum = sum([tree.value for tree in trees_descend])
     trees_for_next_row = []
+    dic_k = {}
     lst_of_pairs = []
+
+    # base case: no more trees to iterate through
+    if lst_of_trees == []:
+        return []
 
     # recursive case, complete one row, then call function again.
     for k, _ in enumerate(trees_descend):
-        row_layout_k, leftover_k = compute_row(bounding_rec,
-                                               trees_descend[:k+1], total_sum)
-        distortion_k = max([(max(pair[0].height, pair[0].width)
-                           / min(pair[0].height, pair[0].width))
-                           for pair in row_layout_k])
-        if k == 0 or distortion_previous_k >= distortion_k:  # proceed to next k
-            row_layout_previous_k = row_layout_k
-            leftover_previous_k = leftover_k
-            distortion_previous_k = distortion_k
+        dic_k["row_layout"], dic_k["leftover"] = compute_row(bounding_rec,
+                                                 trees_descend[:k+1], total_sum)
+        dic_k["distortion"] = compute_distortion(dic_k["row_layout"])
+        if k == 0 or dic_previous_k["distortion"] >= dic_k["distortion"]:
+            dic_previous_k = dict(dic_k)
         else:  # stop row
             trees_for_next_row = trees_descend[k:]
             break
 
-    final_rows_layout = row_layout_previous_k +\
+    final_rows_layout = dic_previous_k["row_layout"] +\
                         help_compute_rectangles(trees_for_next_row,
-                                                leftover_previous_k)
+                                                dic_previous_k["leftover"])
 
-#### below is multilevel. Factor out to separate function? solves too many variables issue
-
-    for pair in final_rows_layout:
-        rec, tr = pair
+    # recursive calls for children of trees until recs only correspond to leaves
+    for rec, tr in final_rows_layout:
         if tr.num_children() > 0:
             lst_of_pairs = lst_of_pairs +\
                            help_compute_rectangles(tr.children, rec)
         else:
-            lst_of_pairs.append(pair)
+            lst_of_pairs.append((rec, tr))
 
     return lst_of_pairs
 
+
+def compute_distortion(row_layout):
+    '''
+    Takes list of tuples of rectangles and corresponding trees and returns the
+    value of the highest aspect ratio within that list.
+
+    Inputs:
+        row_layout(list): List of tuples with rectangles and corresponding trees.
+
+    Returns:
+        distortion (float): The distortion of the list of rectangles
+    '''
+    distortion = max([(max(rec.height, rec.width) / min(rec.height, rec.width))
+                 for rec, tree in row_layout])
+
+    return distortion
 
 
 
