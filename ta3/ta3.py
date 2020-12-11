@@ -1,3 +1,6 @@
+# Jake Underland
+
+
 def next_in_pattern(lst):
     '''
     Finds the next number in the pattern, assuming the pattern
@@ -17,4 +20,6 @@ def next_in_pattern(lst):
     if finite_dif[0] == finite_dif[1]:
         return next_number + finite_dif[-1]
     else: 
-        return finite_dif[-1] + next_in_pattern(finite_dif)
+        return next_number + next_in_pattern(finite_dif)
+
+
