@@ -10,7 +10,7 @@ Programming Assignments
 | Programming Assignment #3 |    91 |       |
 | Programming Assignment #4 |   100 |       |
 | Programming Assignment #5 |   100 |       |
-| Programming Assignment #6 |    99 | Late  |
+| Programming Assignment #6 |   100 | Late  |
 
 You have 1 late submissions left
 
@@ -48,13 +48,13 @@ Total
 =====
 |                         | Points Obtained | Points Possible (so far) | Maximum Points |
 |-------------------------|----------------:|-------------------------:|---------------:|
-| Programming Assignments |           48.83 |                    50.00 |             50 |
+| Programming Assignments |           48.92 |                    50.00 |             50 |
 | Short Exercises         |           15.00 |                    15.00 |             15 |
 | Timed Assessments       |           25.60 |                    30.00 |             30 |
 | Quizzes                 |            5.00 |                     5.00 |              5 |
-| **TOTAL**               |           94.43 |                   100.00 |            100 |
+| **TOTAL**               |           94.52 |                   100.00 |            100 |
 
-Your total score (out of 100) is 94.43
+Your total score (out of 100) is 94.52
 
-Your grade: A-
+Your grade: A
 
